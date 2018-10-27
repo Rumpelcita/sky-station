@@ -28,7 +28,9 @@ BasicGame.Game = function (game) {
 BasicGame.Game.prototype = {
 
     create: function () {
+        blinking = false;
         current_sky = fetchSky(0);
+        current_glitch = 1;
         skies = this.game.add.group();
         glitches = this.game.add.group();
         skies.create(90, 130, 'sky-' + current_sky.toString());
@@ -42,11 +44,26 @@ BasicGame.Game.prototype = {
         punch.alpha = 0;
         hit_box = this.game.add.button(0, 0, 'hit_box', this.punchTV, this, 0, 0, 0);
         tv = this.game.add.sprite(42.5, 95, 'tv');
-        tv.button_1 = this.game.add.button(782, 325, 'button', switchChannel, this, 1, 0, 1);
+        tv.button_switch = this.game.add.button(782, 325, 'button', switchChannel, this, 1, 0, 1);
+        tv.export_anim = this.game.add.sprite(812, 154, 'export_button');
+        tv.export_anim.inputEnabled = true;
+        tv.export_anim.animations.add('blink', [0, 1]);
+        tv.export_anim.alpha = 0;
+        this.game.input.addMoveCallback(p, this);
+        tv.button_export = this.game.add.button(812, 154, 'export_button', this.exportChannel, this, 2, 1, 1);
     },
 
     update: function () {
         playNoise(true);
+        if (blinking){
+            if (tv.button_export.input.pointerOver()){
+                tv.button_export.alpha = 1;
+                tv.export_anim.alpha = 0;
+            } else{
+                tv.export_anim.alpha = 1;
+                tv.button_export.alpha = 0;
+            }
+        }
     },
 
     quitGame: function (pointer) {
@@ -66,9 +83,32 @@ BasicGame.Game.prototype = {
             static.rolled_noise = false;
             playNoise();
             makeGlitch();
+            downloadBlink();
         }
+    },
+
+    exportChannel: function(){
+        window.open(this.game.canvas.toDataURL());
     }
 };
+
+function p(pointer) {
+
+    // console.log(pointer.);
+    //console.log(pointer.event);
+
+}
+
+
+function downloadBlink(){
+    if (tv.export_anim.alpha == 0){
+        blinking = true;
+        tv.button_export.alpha = 0;
+        tv.export_anim.alpha = 1;
+        tv.export_anim.animations.play('blink', 6, true);
+        console.log(tv.export_anim.animations.isPlaying);
+    }
+}
 
 function switchChannel(){
     static.has_noise = 1;
@@ -85,6 +125,7 @@ function switchChannel(){
                     sky.kill();
                 }
                 )
+            clearGlitch();
             current_sky = fetchSky(current_sky);
             skies.create(90, 130, 'sky-' + current_sky.toString());
             setNoise();
@@ -127,16 +168,19 @@ function playNoise(loop=false){
 }
 
 function makeGlitch () {
-    var current_glitch = 1;
+    clearGlitch();
+    var glitch_roll = current_glitch;
+    while (glitch_roll.toString() == current_glitch){
+        glitch_roll = Math.floor(Math.random() * (Math.ceil(54) - Math.floor(1) + 1)) + 1;
+    }
+    glitches.create(90, 130, 'glitch-' + glitch_roll.toString());
+}
+
+function clearGlitch(){
     glitches.forEachAlive(
         function(glitch){
             current_glitch = glitch.key;
             glitch.kill();
         }
     );
-    var glitch_roll = current_glitch;
-    while (glitch_roll.toString() == current_glitch){
-        glitch_roll = Math.floor(Math.random() * (Math.ceil(54) - Math.floor(1) + 1)) + 1;
-    }
-    glitches.create(90, 130, 'glitch-' + glitch_roll.toString());
 }

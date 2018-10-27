@@ -14,8 +14,7 @@ BasicGame.Preloader.prototype = {
 
 		//	These are the assets we loaded in Boot.js
 		//	A nice sparkly background and a loading progress bar
-		this.cachedBar = this.cache.getImage('preloaderBar');
-		this.preloadBar = this.add.sprite(this.game.world.centerX - this.cachedBar.width/2.0, this.game.world.centerY - this.cachedBar.height/2.0, 'preloaderBar');
+		this.preloadBar = this.add.sprite(this.game.world.centerX, this.game.world.centerY, 'preloaderBar');
 		this.preloadBar.anchor.setTo(0.5);
 
 		//	This sets the preloadBar sprite as a loader sprite.
@@ -33,6 +32,7 @@ BasicGame.Preloader.prototype = {
 
 		//Load button plus tv
 		this.game.load.spritesheet('button', 'assets/button.png', 115, 129.5);
+		this.game.load.spritesheet('export_button', 'assets/export.png', 62, 65);
 		this.game.load.spritesheet('hit_box', 'assets/hit_box.png', 952, 95);
 		this.game.load.image('tv', 'assets/tv.png');
 		this.game.load.spritesheet('static', 'assets/static.png', 678, 530);
