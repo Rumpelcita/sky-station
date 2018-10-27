@@ -30,7 +30,8 @@ BasicGame.Game.prototype = {
     create: function () {
         current_sky = fetchSky(0);
         skies = this.game.add.group();
-        skies.create(90, 130, current_sky.toString());
+        glitches = this.game.add.group();
+        skies.create(90, 130, 'sky-' + current_sky.toString());
         static = this.game.add.sprite(90, 130, 'static');
         static.has_noise = false;
         static.rolled_noise = false;
@@ -64,9 +65,9 @@ BasicGame.Game.prototype = {
             static.has_noise = 0;
             static.rolled_noise = false;
             playNoise();
+            makeGlitch();
         }
     }
-
 };
 
 function switchChannel(){
@@ -85,7 +86,7 @@ function switchChannel(){
                 }
                 )
             current_sky = fetchSky(current_sky);
-            skies.create(90, 130, current_sky.toString());
+            skies.create(90, 130, 'sky-' + current_sky.toString());
             setNoise();
             console.log('channel switched');
         }, 
@@ -123,4 +124,19 @@ function playNoise(loop=false){
         static.alpha = 0;
         static.animations.stop();
     }
+}
+
+function makeGlitch () {
+    var current_glitch = 1;
+    glitches.forEachAlive(
+        function(glitch){
+            current_glitch = glitch.key;
+            glitch.kill();
+        }
+    );
+    var glitch_roll = current_glitch;
+    while (glitch_roll.toString() == current_glitch){
+        glitch_roll = Math.floor(Math.random() * (Math.ceil(54) - Math.floor(1) + 1)) + 1;
+    }
+    glitches.create(90, 130, 'glitch-' + glitch_roll.toString());
 }
